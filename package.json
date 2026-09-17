@@ -6,6 +6,7 @@
     "expo": "~57.0.23",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
+    "react-hook-form": "^7.88.0",
     "react-native": "0.86.3"
   },
   "scripts": {
@@ -14,5 +15,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-native": "^0.72.8"
+  }
 }
