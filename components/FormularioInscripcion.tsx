@@ -1,7 +1,8 @@
 import React from 'react';
 import { KeyboardAvoidingView, ScrollView, Platform, StyleSheet } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
 // Tipos
 import { InscripcionForm } from '../types';
 
@@ -25,9 +26,37 @@ interface FormularioInscripcionProps {
 
 export default function FormularioInscripcion({ onEnviar }: FormularioInscripcionProps) {
   // mode: 'onChange' permite que los errores desaparezcan en tiempo real cuando el usuario corrige
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<InscripcionForm>({
+  // Extraemos 'reset' de useForm para poder inyectar el email guardado
+  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<InscripcionForm>({
     mode: 'onChange',
   });
+
+  // 1. LECTURA: Al abrir el formulario, buscamos el email guardado
+  useEffect(() => {
+    const cargarDatosGuardados = async () => {
+      try {
+        const emailGuardado = await AsyncStorage.getItem('@ultimo_email');
+        if (emailGuardado) {
+          // Si existe, le decimos a react-hook-form que actualice ese campo específico
+          reset({ email: emailGuardado }); 
+        }
+      } catch (error) {
+        console.error('Error leyendo AsyncStorage:', error);
+      }
+    };
+    
+    cargarDatosGuardados();
+  }, []); // El array vacío asegura que esto corra solo 1 vez al montar el componente
+
+  const procesarEnvio = async (datos: InscripcionForm) => {
+    try {
+      await AsyncStorage.setItem('@ultimo_email', datos.email);
+    } catch (error) {
+      console.error('Error guardando en AsyncStorage:', error);
+    }
+    // Después de guardar, continuamos con el flujo normal hacia el padre
+    onEnviar(datos);
+  };
 
   return (
     <KeyboardAvoidingView 
@@ -118,7 +147,7 @@ export default function FormularioInscripcion({ onEnviar }: FormularioInscripcio
 
         <Boton 
           titulo="Confirmar inscripción" 
-          onPress={handleSubmit(onEnviar)} 
+          onPress={handleSubmit(procesarEnvio)} 
           disabled={!isValid} 
         />
         

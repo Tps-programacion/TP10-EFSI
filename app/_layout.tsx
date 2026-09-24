@@ -1,11 +1,15 @@
 import { Stack } from 'expo-router';
 
-export default function RootLayout() {
+export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen 
         name="index" 
-        options={{ title: 'Inscripción al Evento' }} 
+        options={{ 
+          title: 'Inscripción Sonido Sur',
+          headerShown: true,
+          headerBackVisible: false 
+        }} 
       />
     </Stack>
   );
